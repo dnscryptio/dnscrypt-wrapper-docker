@@ -18,8 +18,8 @@ To build the image and run bash in an instance:
 
 # Todo
 
- [ ] Read certificate files from outside container
- [ ] Listen on ports from outside container
- [ ] Connect to DNS server outside container
- [ ] Enable starting through CMD/ENTRYPOINT
- [ ] Automate testing
+  [ ] Read certificate files from outside container
+  [ ] Listen on ports from outside container
+  [ ] Connect to DNS server outside container
+  [ ] Enable starting through CMD/ENTRYPOINT
+  [ ] Automate testing
