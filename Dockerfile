@@ -1,7 +1,7 @@
 FROM debian
 MAINTAINER dnscrypt.io
 
-ENV BUILD_DEPENDENCIES curl gcc make bzip2
+ENV BUILD_DEPENDENCIES curl gcc make bzip2 autoconf
 RUN set -x && \
     apt-get update && \
     apt-get install -y $BUILD_DEPENDENCIES 
