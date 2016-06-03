@@ -1,11 +1,12 @@
 FROM debian
 MAINTAINER dnscrypt.io
 
+RUN set -x && \
+    apt-get update
+
 ENV BUILD_DEPENDENCIES curl gcc make bzip2 autoconf
 RUN set -x && \
-    apt-get update && \
     apt-get install -y $BUILD_DEPENDENCIES 
-#    --no-install-recommends
 
 ENV LIBSODIUM_VERSION 1.0.10
 ENV LIBSODIUM_SHA256 71b786a96dd03693672b0ca3eb77f4fb08430df307051c0d45df5353d22bc4be
@@ -29,7 +30,6 @@ ENV DNSCRYPT_WRAPPER_SHA256 d26f9d6329653b71bed5978885385b45f16596021f219f46e49d
 ENV DNSCRYPT_WRAPPER_DOWNLOAD_URL https://github.com/Cofyc/dnscrypt-wrapper/releases/download/v${DNSCRYPT_WRAPPER_VERSION}/dnscrypt-wrapper-v${DNSCRYPT_WRAPPER_VERSION}.tar.bz2
 
 RUN set -x && \
-    apt-get update && \
     apt-get install -y libevent-2.0 libevent-dev \
     --no-install-recommends
     
