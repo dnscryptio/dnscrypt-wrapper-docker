@@ -33,6 +33,8 @@ RUN set -x && \
 ENV DNSCRYPT_WRAPPER_VERSION 0.2
 ENV DNSCRYPT_WRAPPER_SHA256 d26f9d6329653b71bed5978885385b45f16596021f219f46e49da60d5813054e
 ENV DNSCRYPT_WRAPPER_DOWNLOAD_URL https://github.com/Cofyc/dnscrypt-wrapper/releases/download/v${DNSCRYPT_WRAPPER_VERSION}/dnscrypt-wrapper-v${DNSCRYPT_WRAPPER_VERSION}.tar.bz2
+ENV DNSCRYPT_WRAPPER_USER dnscrypt-wrapper
+ENV DNSCRYPT_WRAPPER_KEYS /opt/dnscrypt-wrapper/etc/keys
 
 RUN set -x && \
     apt-get update && \
@@ -50,8 +52,9 @@ RUN set -x && \
     ./configure --prefix=/opt/dnscrypt-wrapper --with-sodium=/opt/libsodium && \
     make install && \
     mkdir -p /opt/dnscrypt-wrapper/empty && \
-    groupadd _dnscrypt-wrapper && \
-    useradd -g _dnscrypt-wrapper -s /etc -d /opt/dnscrypt-wrapper/empty _dnscrypt-wrapper && \
+    groupadd ${DNSCRYPT_WRAPPER_USER} && \
+    useradd -g ${DNSCRYPT_WRAPPER_USER} -s /bin/false -d /opt/dnscrypt-wrapper/empty ${DNSCRYPT_WRAPPER_USER} && \
+    mkdir -p ${DNSCRYPT_WRAPPER_KEYS} && \
     apt-get purge -y --auto-remove libevent-dev && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -60,3 +63,14 @@ RUN set -x && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+EXPOSE 53 443
+
+VOLUME ${DNSCRYPT_WRAPPER_KEYS}
+
+USER ${DNSCRYPT_WRAPPER_USER}
+
+ENTRYPOINT ["/opt/dnscrypt-wrapper/sbin/dnscrypt-wrapper"]
+
+CMD ["--help"]
+
