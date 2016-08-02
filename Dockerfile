@@ -64,13 +64,8 @@ RUN set -x && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-EXPOSE 53 443
-
-VOLUME ${DNSCRYPT_WRAPPER_KEYS}
-
 USER ${DNSCRYPT_WRAPPER_USER}
 
 ENTRYPOINT ["/opt/dnscrypt-wrapper/sbin/dnscrypt-wrapper"]
 
 CMD ["--help"]
-
