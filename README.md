@@ -18,7 +18,7 @@ To build the image:
 
 To run a container in interactive mode:
 
-    KEYFILE=<WHERE-KEYS-RESIDE-ON-HOST>
+    KEYDIR=<WHERE-KEYS-RESIDE-ON-HOST>
     docker run -it -v $KEYDIR:/opt/dnscrypt-wrapper/etc/keys -p 127.0.0.1:4443:4443/udp dnscrypt-wrapper \
     --listen-address=0.0.0.0:4443 \
     --resolver-address=8.8.8.8:53 \
