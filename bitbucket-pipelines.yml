@@ -1,5 +1,6 @@
 pipelines:
   default:
     - step:
+        image: docker
         script:
-          - echo "Everything is awesome!"
+          - docker build -t dnscrypt-wrapper .
