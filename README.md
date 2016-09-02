@@ -16,10 +16,21 @@ To build the image:
 
     docker build -t dnscrypt-wrapper .
 
-To run a container in interactive mode:
+To start a container:
 
     KEYDIR=<WHERE-KEYS-RESIDE-ON-HOST>
-    docker run -it -v $KEYDIR:/opt/dnscrypt-wrapper/etc/keys -p 127.0.0.1:4443:4443/udp dnscrypt-wrapper \
+    docker run --volume=$KEYDIR:/opt/dnscrypt-wrapper/etc/keys --publish=127.0.0.1:4443:4443/udp dnscrypt-wrapper \
+    --listen-address=0.0.0.0:4443 \
+    --resolver-address=8.8.8.8:53 \
+    --provider-name=2.dnscrypt-cert.example.com \
+    --provider-cert-file=/opt/dnscrypt-wrapper/etc/keys/dnscrypt.cert \
+    --crypt-secretkey-file=/opt/dnscrypt-wrapper/etc/keys/dnscrypt.key \
+    --daemonize
+
+To start a container in interactive mode, e.g. for test and debugging:
+
+    KEYDIR=<WHERE-KEYS-RESIDE-ON-HOST>
+    docker run --interactive --tty --volume=$KEYDIR:/opt/dnscrypt-wrapper/etc/keys --publish=127.0.0.1:4443:4443/udp dnscrypt-wrapper \
     --listen-address=0.0.0.0:4443 \
     --resolver-address=8.8.8.8:53 \
     --provider-name=2.dnscrypt-cert.example.com \
@@ -35,6 +46,5 @@ To test (requires dnscrypt-proxy):
 
 # Todo
 
- * Run as daemon
  * Understand why provider name apparently have to start with 2.dnscrypt-cert
  * Automate testing
