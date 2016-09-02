@@ -1,6 +1,0 @@
-pipelines:
-  default:
-    - step:
-        image: docker
-        script:
-          - docker build -t dnscrypt-wrapper .
