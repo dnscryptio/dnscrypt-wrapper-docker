@@ -46,5 +46,4 @@ To test (requires dnscrypt-proxy):
 
 # Todo
 
- * Understand why provider name apparently have to start with 2.dnscrypt-cert
  * Automate testing
