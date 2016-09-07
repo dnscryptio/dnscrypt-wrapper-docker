@@ -7,4 +7,4 @@ install:
   - docker build -t dnscrypt-wrapper-docker .
 
 script:
-  - docker run --interactive --tty dnscrypt-wrapper --version
+  - docker run --interactive --tty dnscrypt-wrapper-docker --version
