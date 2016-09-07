@@ -5,3 +5,6 @@ services:
 
 install:
   - docker build -t dnscrypt-wrapper-docker .
+
+script:
+  - docker run --interactive --tty dnscrypt-wrapper --version
