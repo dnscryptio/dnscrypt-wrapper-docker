@@ -1,5 +1,6 @@
 # A minimal docker image with dnscryptwrapper.
 [![Build Status](https://travis-ci.org/dnscryptio/dnscrypt-wrapper-docker.svg?branch=master)](https://travis-ci.org/dnscryptio/dnscrypt-wrapper-docker)
+
 Work in progress, currently builds dnscrypt-wrapper
 
 Maintainer: Egon Kidmose, kidmose@gmail.com
