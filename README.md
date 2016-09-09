@@ -45,6 +45,6 @@ To test (requires dnscrypt-proxy):
     --resolver-address=127.0.0.1:4443 \
     --provider-name=2.dnscrypt-cert.example.com
 
-# Todo
+# Credit
 
- * Automate testing
+The Dockerfile in this project is based on [dnscrypt-server-docker](https://github.com/jedisct1/dnscrypt-server-docker) by [Frank Denis](https://00f.net/).
