@@ -1,4 +1,4 @@
-FROM debian
+FROM debian:8
 MAINTAINER dnscrypt.io
 
 ENV BUILD_DEPENDENCIES \
