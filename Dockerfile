@@ -30,8 +30,8 @@ RUN set -x && \
     echo /opt/libsodium/lib > /etc/ld.so.conf.d/libsodium.conf && ldconfig && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV DNSCRYPT_WRAPPER_VERSION 0.2
-ENV DNSCRYPT_WRAPPER_SHA256 d26f9d6329653b71bed5978885385b45f16596021f219f46e49da60d5813054e
+ENV DNSCRYPT_WRAPPER_VERSION 0.2.2
+ENV DNSCRYPT_WRAPPER_SHA256 6fa0d2bea41a11c551d6b940bf4dffeaaa0e034fffd8c67828ee2093c1230fee
 ENV DNSCRYPT_WRAPPER_DOWNLOAD_URL https://github.com/Cofyc/dnscrypt-wrapper/releases/download/v${DNSCRYPT_WRAPPER_VERSION}/dnscrypt-wrapper-v${DNSCRYPT_WRAPPER_VERSION}.tar.bz2
 ENV DNSCRYPT_WRAPPER_USER dnscrypt-wrapper
 ENV DNSCRYPT_WRAPPER_KEYS /opt/dnscrypt-wrapper/etc/keys
