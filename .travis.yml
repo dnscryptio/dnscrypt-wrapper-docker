@@ -32,6 +32,8 @@ script:
        --provider-name=2.dnscrypt-cert.example.com \
        --provider-cert-file=$CKEYDIR/dnscrypt.cert \
        --crypt-secretkey-file=$CKEYDIR/dnscrypt.key'
+  # Check $PUBLIC_KEYPAIR_FINGERPRINT
+  - echo $PUBLIC_KEYPAIR_FINGERPRINT
   # Run dnscrypt proxy
   - 'docker run --interactive --tty dnscryptio/dnscrypt-proxy-docker /opt/dnscrypt-proxy/sbin/dnscrypt-proxy \
        --local-address=127.0.0.1:53 \
