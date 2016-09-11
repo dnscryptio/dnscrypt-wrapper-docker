@@ -4,7 +4,20 @@ services:
   - docker
 
 install:
+  - mkdir -p /etc/dnscrypt-wrapper/keys
+  - KEYDIR=/etc/dnscrypt-wrapper/keys
+  - CONKEYDIR=/opt/dnscrypt-wrapper/etc/keys
   - docker build -t dnscrypt-wrapper-docker .
+  - docker run --interactive --tty --rm --volume $KEYDIR:$CONKEYDIR -w $CONKEYDIR dnscrypt-wrapper-docker --gen-provider-keypair
+  - docker run --interactive --tty --rm --volume $KEYDIR:$CONKEYDIR -w $CONKEYDIR dnscrypt-wrapper-docker --gen-crypt-keypair
+  - docker run --interactive --tty --rm --volume $KEYDIR:$CONKEYDIR -w $CONKEYDIR dnscrypt-wrapper-docker --gen-cert-file
+  - docker run --interactive --tty --rm --volume $KEYDIR:$CONKEYDIR -w $CONKEYDIR dnscrypt-wrapper-docker --show-provider-publickey-fingerprint --provider-publickey-file=public.key
+
+before_script:
+  - docker pull dnscryptio/dnscrypt-proxy-docker
+  - docker run -d -p 127.0.0.1:53:53/udp dnscryptio/dnscrypt-proxy-docker
 
 script:
-  - docker run --interactive --tty dnscrypt-wrapper-docker --version
+  - docker run -d -v $KEYDIR:$CONKEYDIR -p 127.0.0.1:4443:4443/udp dnscrypt-wrapper-docker --listen-address=0.0.0.0:4443 --resolver-address=8.8.8.8:53 --provider-name=2.dnscrypt-cert.test.dnscrypt.io --provider-cert-file=/opt/dnscrypt-wrapper/etc/keys/dnscrypt.cert --crypt-secretkey-file=/opt/dnscrypt-wrapper/etc/keys/crypt_secret.key
+  - dig @127.0.0.1 google.com
+  - dig @127.0.0.1 dnscrypt.org
