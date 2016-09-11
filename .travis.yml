@@ -3,23 +3,38 @@ sudo: required
 services:
   - docker
 
-install:
-  - mkdir -p /tmp/dnscrypt-wrapper/keys
-  - KEYDIR=/tmp/dnscrypt-wrapper/keys
-  - CONKEYDIR=/opt/dnscrypt-wrapper/etc/keys
-  - docker build -t dnscrypt-wrapper-docker .
-  - bash -c 'docker run --interactive --tty --rm --volume $KEYDIR:$CONKEYDIR -w $CONKEYDIR dnscrypt-wrapper-docker --gen-provider-keypair \| tee /tmp/gen-provider-keypair.log'
-  - bash -c 'egrep \"Public key fingerprint\: \" /tmp/gen-provider-keypair.log \| sed \"s/Public key fingerprint\: //\" >> /tmp/public_keypair-fingerprint'
-  - cat /tmp/public_keypair-fingerprint
-  - docker run --interactive --tty --rm --volume $KEYDIR:$CONKEYDIR -w $CONKEYDIR dnscrypt-wrapper-docker --gen-crypt-keypair
-  - docker run --interactive --tty --rm --volume $KEYDIR:$CONKEYDIR -w $CONKEYDIR dnscrypt-wrapper-docker --gen-cert-file
-  - docker run --interactive --tty --rm --volume $KEYDIR:$CONKEYDIR -w $CONKEYDIR dnscrypt-wrapper-docker --show-provider-publickey-fingerprint --provider-publickey-file=public.key
+env:
+  global:
+    - HKEYDIR=/tmp/dnscrypt-wrapper/keys # Directory for keys on host
+    - CKEYDIR=/opt/dnscrypt-wrapper/etc/keys # Directory for keys in container
 
-before_script:
-  - docker pull dnscryptio/dnscrypt-proxy-docker
-  - docker run -d -p 127.0.0.1:53:53/udp dnscryptio/dnscrypt-proxy-docker
+install:
+  - docker build -t dnscrypt-wrapper .
+  - rm -rf $HKEYDIR
+  - mkdir -p $HKEYDIR
+  # TODO: Start local DNS server, to avoid dependence on the external one at 8.8.8.8
 
 script:
-  - docker run -d -v $KEYDIR:$CONKEYDIR -p 127.0.0.1:4443:4443/udp dnscrypt-wrapper-docker --listen-address=0.0.0.0:4443 --resolver-address=8.8.8.8:53 --provider-name=2.dnscrypt-cert.test.dnscrypt.io --provider-cert-file=/opt/dnscrypt-wrapper/etc/keys/dnscrypt.cert --crypt-secretkey-file=/opt/dnscrypt-wrapper/etc/keys/crypt_secret.key
-  - dig @127.0.0.1 google.com
-  - dig @127.0.0.1 dnscrypt.org
+  # Generate keys
+  - docker run --interactive --tty --rm dnscrypt-wrapper --version
+  - 'docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscrypt-wrapper --gen-provider-keypair | tee /tmp/gen-provider-keypair.log'
+  - 'PUBLIC_KEYPAIR_FINGERPRINT=$(egrep ''Public key fingerprint: '' /tmp/gen-provider-keypair.log | sed ''s/Public key fingerprint: //''); echo $PUBLIC_KEYPAIR_FINGERPRINT | tee $HKEYDIR/fingerprint; [ ! -z "$PUBLIC_KEYPAIR_FINGERPRINT" ]'
+  - stat -t $HKEYDIR/public.key
+  - stat -t $HKEYDIR/secret.key
+  - docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscrypt-wrapper --gen-crypt-keypair
+  - stat -t $HKEYDIR/crypt_secret.key
+  - docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscrypt-wrapper --gen-cert-file
+  - stat -t $HKEYDIR/dnscrypt.cert
+  # start wrapper
+  - 'docker run --detach --volume=$HKEYDIR:$CKEYDIR --publish=127.0.0.1:4443:4443/udp dnscrypt-wrapper \
+       --listen-address=0.0.0.0:4443 \
+       --resolver-address=8.8.8.8:53 \
+       --provider-name=2.dnscrypt-cert.example.com \
+       --provider-cert-file=$CKEYDIR/dnscrypt.cert \
+       --crypt-secretkey-file=$CKEYDIR/dnscrypt.key'
+  # Run dnscrypt proxy
+  - 'docker run --interactive --tty dnscryptio/dnscrypt-proxy-docker /opt/dnscrypt-proxy/sbin/dnscrypt-proxy \
+       --local-address=127.0.0.1:53
+       --provider-key=$PUBLIC_KEYPAIR_FINGERPRINT \
+       --provider-name=2.dnscrypt-cert.example.com \
+       --resolver-address=127.0.0.1:4443'
