@@ -4,8 +4,8 @@ services:
   - docker
 
 install:
-  - mkdir -p /etc/dnscrypt-wrapper/keys
-  - KEYDIR=/etc/dnscrypt-wrapper/keys
+  - mkdir -p /tmp/dnscrypt-wrapper/keys
+  - KEYDIR=/tmp/dnscrypt-wrapper/keys
   - CONKEYDIR=/opt/dnscrypt-wrapper/etc/keys
   - docker build -t dnscrypt-wrapper-docker .
   - docker run --interactive --tty --rm --volume $KEYDIR:$CONKEYDIR -w $CONKEYDIR dnscrypt-wrapper-docker --gen-provider-keypair
