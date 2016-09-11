@@ -9,7 +9,7 @@ install:
   - CONKEYDIR=/opt/dnscrypt-wrapper/etc/keys
   - docker build -t dnscrypt-wrapper-docker .
   - bash -c 'docker run --interactive --tty --rm --volume $KEYDIR:$CONKEYDIR -w $CONKEYDIR dnscrypt-wrapper-docker --gen-provider-keypair \| tee /tmp/gen-provider-keypair.log'
-  - bash -c 'egrep "Public key fingerprint: " /tmp/gen-provider-keypair.log \| sed "s/Public key fingerprint: //" >> /tmp/public_keypair-fingerprint'
+  - bash -c 'egrep \"Public key fingerprint: \" /tmp/gen-provider-keypair.log \| sed \"s/Public key fingerprint: //\" >> /tmp/public_keypair-fingerprint'
   - cat /tmp/public_keypair-fingerprint
   - docker run --interactive --tty --rm --volume $KEYDIR:$CONKEYDIR -w $CONKEYDIR dnscrypt-wrapper-docker --gen-crypt-keypair
   - docker run --interactive --tty --rm --volume $KEYDIR:$CONKEYDIR -w $CONKEYDIR dnscrypt-wrapper-docker --gen-cert-file
