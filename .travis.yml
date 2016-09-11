@@ -29,14 +29,10 @@ script:
   - 'docker run --detach --volume=$HKEYDIR:$CKEYDIR --publish=127.0.0.1:4443:4443/udp dnscrypt-wrapper \
        --listen-address=0.0.0.0:4443 \
        --resolver-address=8.8.8.8:53 \
-       --provider-name=2.dnscrypt-cert.example.com \
+       --provider-name=2.dnscrypt-cert.test.dnscrypt.io \
        --provider-cert-file=$CKEYDIR/dnscrypt.cert \
        --crypt-secretkey-file=$CKEYDIR/dnscrypt.key'
   # Check $PUBLIC_KEYPAIR_FINGERPRINT
   - echo $PUBLIC_KEYPAIR_FINGERPRINT
   # Run dnscrypt proxy
-  - 'docker run --interactive --tty dnscryptio/dnscrypt-proxy-docker /opt/dnscrypt-proxy/sbin/dnscrypt-proxy \
-       --local-address=127.0.0.1:53 \
-       --provider-key=$PUBLIC_KEYPAIR_FINGERPRINT \
-       --provider-name=2.dnscrypt-cert.example.com \
-       --resolver-address=127.0.0.1:4443'
+  - docker run -e RESOLVER_ADDR=127.0.0.1:4443 -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT dnscryptio/dnscrypt-proxy-docker
