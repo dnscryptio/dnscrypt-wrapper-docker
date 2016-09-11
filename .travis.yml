@@ -34,7 +34,7 @@ script:
        --crypt-secretkey-file=$CKEYDIR/dnscrypt.key'
   # Run dnscrypt proxy
   - 'docker run --interactive --tty dnscryptio/dnscrypt-proxy-docker /opt/dnscrypt-proxy/sbin/dnscrypt-proxy \
-       --local-address=127.0.0.1:53
+       --local-address=127.0.0.1:53 \
        --provider-key=$PUBLIC_KEYPAIR_FINGERPRINT \
        --provider-name=2.dnscrypt-cert.example.com \
        --resolver-address=127.0.0.1:4443'
