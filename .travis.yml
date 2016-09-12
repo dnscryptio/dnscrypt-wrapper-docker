@@ -26,11 +26,11 @@ script:
   - docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscrypt-wrapper --gen-cert-file
   - stat -t $HKEYDIR/dnscrypt.cert
   # start wrapper
-  - 'docker run --detach --volume=$HKEYDIR:$CKEYDIR --expose=4443 --name=wrapper dnscrypt-wrapper \
-       --listen-address=0.0.0.0:4443 \
+  - 'docker run --detach --volume=$HKEYDIR:$CKEYDIR --expose=443 --name=wrapper dnscrypt-wrapper \
+       --listen-address=0.0.0.0:443 \
        --resolver-address=8.8.8.8:53 \
        --provider-name=2.dnscrypt-cert.test.dnscrypt.io \
        --provider-cert-file=$CKEYDIR/dnscrypt.cert \
        --crypt-secretkey-file=$CKEYDIR/dnscrypt.key'
   # Run dnscrypt proxy
-  - docker run -e RESOLVER_ADDR=wrapper:4443 -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 dnscryptio/dnscrypt-proxy-docker
+  - docker run -e RESOLVER_ADDR=wrapper -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 dnscryptio/dnscrypt-proxy-docker
