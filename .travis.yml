@@ -10,6 +10,7 @@ env:
     
 before_install:
   - 'HOSTIP=$(ip addr | grep ''state UP'' -A2 | tail -n1 | awk ''{print $2}'' | cut -f1  -d''/'')'
+  - echo $HOSTIP
 
 install:
   - docker build -t dnscrypt-wrapper .
@@ -36,4 +37,4 @@ script:
        --provider-cert-file=$CKEYDIR/dnscrypt.cert \
        --crypt-secretkey-file=$CKEYDIR/dnscrypt.key'
   # Run dnscrypt proxy
-  - docker run -e RESOLVER_ADDR=$HOSTIP -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 --link wrapper dnscryptio/dnscrypt-proxy-docker
+  - docker run -e RESOLVER_ADDR=$HOSTIP -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 dnscryptio/dnscrypt-proxy-docker
