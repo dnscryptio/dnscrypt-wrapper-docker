@@ -7,6 +7,9 @@ env:
   global:
     - HKEYDIR=/tmp/dnscrypt-wrapper/keys # Directory for keys on host
     - CKEYDIR=/opt/dnscrypt-wrapper/etc/keys # Directory for keys in container
+    
+before_install:
+  - 'HOSTIP=$(ip addr | grep ''state UP'' -A2 | tail -n1 | awk ''{print $2}'' | cut -f1  -d''/'')'
 
 install:
   - docker build -t dnscrypt-wrapper .
@@ -26,11 +29,11 @@ script:
   - docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscrypt-wrapper --gen-cert-file
   - stat -t $HKEYDIR/dnscrypt.cert
   # start wrapper
-  - 'docker run --detach --volume=$HKEYDIR:$CKEYDIR --expose=443 --name=wrapper dnscrypt-wrapper \
-       --listen-address=0.0.0.0:443 \
+  - 'docker run --detach --volume=$HKEYDIR:$CKEYDIR --publish=$HOSTIP:4443:4443 --name=wrapper dnscrypt-wrapper \
+       --listen-address=0.0.0.0:4443 \
        --resolver-address=8.8.8.8:53 \
        --provider-name=2.dnscrypt-cert.test.dnscrypt.io \
        --provider-cert-file=$CKEYDIR/dnscrypt.cert \
        --crypt-secretkey-file=$CKEYDIR/dnscrypt.key'
   # Run dnscrypt proxy
-  - docker run -e RESOLVER_ADDR=wrapper -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 dnscryptio/dnscrypt-proxy-docker
+  - docker run -e RESOLVER_ADDR=$HOSTIP -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 --link wrapper dnscryptio/dnscrypt-proxy-docker
