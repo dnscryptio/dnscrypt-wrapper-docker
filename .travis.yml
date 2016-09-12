@@ -32,7 +32,9 @@ script:
        --provider-name=2.dnscrypt-cert.test.dnscrypt.io \
        --provider-cert-file=$CKEYDIR/dnscrypt.cert \
        --crypt-secretkey-file=$CKEYDIR/dnscrypt.key'
-  # get wrapper internal ip
+  # Is the dnscrypt-wrapper container running?
+  - docker ps | grep dnscrypt-wrapper
+  # Get wrapper internal ip
   - 'WRAPPERIP=$(docker inspect -f ''{{ .NetworkSettings.IPAddress }}'' wrapper)'
   - echo $WRAPPERIP
   # Run dnscrypt proxy
