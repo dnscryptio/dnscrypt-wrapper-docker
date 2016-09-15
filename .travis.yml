@@ -38,4 +38,4 @@ script:
   - 'WRAPPERIP=$(docker inspect -f ''{{ .NetworkSettings.IPAddress }}'' wrapper)'
   - echo $WRAPPERIP
   # Run dnscrypt proxy
-  - docker run -e RESOLVER_ADDR=$WRAPPERIP:4443 -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 dnscryptio/dnscrypt-proxy-docker
+  - docker run -e RESOLVER_ADDR=$WRAPPERIP:4443 -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 --link wrapper dnscryptio/dnscrypt-proxy-docker
