@@ -3,8 +3,48 @@ sudo: required
 services:
   - docker
 
+env:
+  global:
+    - HKEYDIR=/tmp/dnscrypt-wrapper/keys # Directory for keys on host
+    - CKEYDIR=/opt/dnscrypt-wrapper/etc/keys # Directory for keys in container
+
 install:
-  - docker build -t dnscrypt-wrapper-docker .
+  - docker build -t dnscryptio/dnscrypt-wrapper .
+  - rm -rf $HKEYDIR
+  - mkdir -p $HKEYDIR
+  # TODO: Start local DNS server, to avoid dependence on the external one at 8.8.8.8
 
 script:
-  - docker run --interactive --tty dnscrypt-wrapper-docker --version
+  # Generate keys
+  - docker run --interactive --tty --rm dnscryptio/dnscrypt-wrapper --version
+  - 'docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscryptio/dnscrypt-wrapper --gen-provider-keypair | tee /tmp/gen-provider-keypair.log'
+  - 'PUBLIC_KEYPAIR_FINGERPRINT=$(egrep ''Public key fingerprint: '' /tmp/gen-provider-keypair.log | sed ''s/Public key fingerprint: //''); echo $PUBLIC_KEYPAIR_FINGERPRINT | tee $HKEYDIR/fingerprint; [ ! -z "$PUBLIC_KEYPAIR_FINGERPRINT" ]'
+  - stat -t $HKEYDIR/public.key
+  - stat -t $HKEYDIR/secret.key
+  - docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscryptio/dnscrypt-wrapper --gen-crypt-keypair
+  - stat -t $HKEYDIR/crypt_secret.key
+  - docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscryptio/dnscrypt-wrapper --gen-cert-file
+  - stat -t $HKEYDIR/dnscrypt.cert
+  # How does the host key dir look?
+  - ls -lah $HKEYDIR
+  # start wrapper
+  - docker run --volume=$HKEYDIR:$CKEYDIR -w $CKEYDIR --expose=4443 --name=wrapper --detach dnscryptio/dnscrypt-wrapper --listen-address=0.0.0.0:4443 --resolver-address=8.8.8.8:53 --provider-name=2.dnscrypt-cert.test.dnscrypt.io --provider-cert-file=$CKEYDIR/dnscrypt.cert --crypt-secretkey-file=$CKEYDIR/crypt_secret.key
+  # Is the dnscrypt-wrapper container running?
+  - sleep 10; docker ps | grep dnscrypt-wrapper
+  # Anything interesting in the logs?
+  - docker logs --details -t wrapper
+  # Get wrapper internal ip
+  - 'WRAPPERIP=$(docker inspect -f ''{{ .NetworkSettings.IPAddress }}'' wrapper)'
+  - echo $WRAPPERIP
+  # Run dnscrypt proxy
+  - docker run --detach --name=proxy -e RESOLVER_ADDR=$WRAPPERIP:4443 -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 -p 127.0.0.1:53:53/udp dnscryptio/dnscrypt-proxy
+  # Logs?
+  - docker logs -t --details proxy
+  # Ya dig?
+  - dig @127.0.0.1 www.google.com
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker push dnscryptio/dnscrypt-wrapper;
+    fi
