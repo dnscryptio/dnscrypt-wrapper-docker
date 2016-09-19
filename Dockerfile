@@ -74,7 +74,7 @@ ENV RESOLVER_ADDRESS=8.8.8.8
 ENV RESOLVER_PORT=53
 
 CMD /opt/dnscrypt-wrapper/sbin/dnscrypt-wrapper \
-        --listen-address=$LISTEN_ADDRESS:$LISTEN_PORT
+        --listen-address=$LISTEN_ADDRESS:$LISTEN_PORT \
         --resolver-address=$RESOLVER_ADDRESS:$RESOLVER_PORT \
         --provider-name=$PROVIDER_NAME \
         --provider-cert-file=$KEYDIR/dnscrypt.cert \
