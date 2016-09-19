@@ -25,6 +25,8 @@ script:
   - stat -t $HKEYDIR/crypt_secret.key
   - docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscrypt-wrapper --gen-cert-file
   - stat -t $HKEYDIR/dnscrypt.cert
+  # How does the host key dir look?
+  - ls -lah $HKEYDIR
   # start wrapper
   - 'docker run --volume=$HKEYDIR:$CKEYDIR --expose=4443 --name=wrapper --detach dnscrypt-wrapper \
         --listen-address=0.0.0.0:4443 \
@@ -32,8 +34,10 @@ script:
         --provider-name=2.dnscrypt-cert.test.dnscrypt.io \
         --provider-cert-file=$CKEYDIR/dnscrypt.cert \
         --crypt-secretkey-file=$CKEYDIR/crypt_secret.key'
-  # Is the dnscrypt-wrapper container running? And what did it do?
-  - sleep 10; docker ps | grep dnscrypt-wrapper; docker logs --details -t wrapper
+  # Is the dnscrypt-wrapper container running?
+  - sleep 10; docker ps | grep dnscrypt-wrapper
+  # Anything interesting in the logs?
+  - docker logs --details -t wrapper
   # Get wrapper internal ip
   - 'WRAPPERIP=$(docker inspect -f ''{{ .NetworkSettings.IPAddress }}'' wrapper)'
   - echo $WRAPPERIP
