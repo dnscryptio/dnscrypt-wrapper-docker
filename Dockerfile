@@ -66,16 +66,6 @@ RUN set -x && \
 
 USER ${DNSCRYPT_WRAPPER_USER}
 
-ENV KEYDIR=/opt/dnscrypt-wrapper/etc/keys
-ENV LISTEN_ADDRESS=0.0.0.0
-ENV LISTEN_PORT=443
-ENV PROVIDER_NAME=2.dnscrypt-cert.example.com
-ENV RESOLVER_ADDRESS=8.8.8.8
-ENV RESOLVER_PORT=53
+ENTRYPOINT ["/opt/dnscrypt-wrapper/sbin/dnscrypt-wrapper"]
 
-CMD /opt/dnscrypt-wrapper/sbin/dnscrypt-wrapper \
-        --listen-address=$LISTEN_ADDRESS:$LISTEN_PORT \
-        --resolver-address=$RESOLVER_ADDRESS:$RESOLVER_PORT \
-        --provider-name=$PROVIDER_NAME \
-        --provider-cert-file=$KEYDIR/dnscrypt.cert \
-        --crypt-secretkey-file=$KEYDIR/crypt_secret.key
+CMD ["--help"]
