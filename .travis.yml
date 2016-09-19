@@ -26,17 +26,16 @@ script:
   - docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscrypt-wrapper --gen-cert-file
   - stat -t $HKEYDIR/dnscrypt.cert
   # start wrapper
-  - 'docker run --volume=$HKEYDIR:$CKEYDIR --expose=4443 --name=wrapper --detach dnscrypt-wrapper \
-       --listen-address=0.0.0.0:4443 \
-       --resolver-address=8.8.8.8:53 \
-       --provider-name=2.dnscrypt-cert.test.dnscrypt.io \
-       --provider-cert-file=$CKEYDIR/dnscrypt.cert \
-       --crypt-secretkey-file=$CKEYDIR/crypt_secret.key'
-  # Is the dnscrypt-wrapper container running?
-  - sleep 10; docker ps | grep dnscrypt-wrapper
+  - 'docker run --volume=$HKEYDIR:$CKEYDIR --expose=443 --name=wrapper --detach \
+       -e LISTEN_ADDRESS=0.0.0.0
+       -e LISTEN_PORT=443
+       -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io
+       dnscrypt-wrapper \
+  # Is the dnscrypt-wrapper container running? And what did it do?
+  - sleep 10; docker ps | grep dnscrypt-wrapper; docker logs --details -t wrapper
   # Get wrapper internal ip
   - 'WRAPPERIP=$(docker inspect -f ''{{ .NetworkSettings.IPAddress }}'' wrapper)'
   - echo $WRAPPERIP
   # Run dnscrypt proxy
-  - docker run -e RESOLVER_ADDR=$WRAPPERIP:4443 -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 -p 127.0.0.1:53:53/udp dnscryptio/dnscrypt-proxy-docker
+  - docker run -e RESOLVER_ADDR=$WRAPPERIP:443 -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 -p 127.0.0.1:53:53/udp dnscryptio/dnscrypt-proxy-docker
   - dig @127.0.0.1 www.google.com
