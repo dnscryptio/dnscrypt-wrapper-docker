@@ -28,7 +28,7 @@ script:
   # How does the host key dir look?
   - ls -lah $HKEYDIR
   # start wrapper
-  - 'docker run --volume=$HKEYDIR:$CKEYDIR --expose=4443 --name=wrapper --detach dnscrypt-wrapper \
+  - 'docker run --volume=$HKEYDIR:$CKEYDIR -w $CKEYDIR --expose=4443 --name=wrapper --detach dnscrypt-wrapper \
         --listen-address=0.0.0.0:4443 \
         --resolver-address=8.8.8.8:53 \
         --provider-name=2.dnscrypt-cert.test.dnscrypt.io \
