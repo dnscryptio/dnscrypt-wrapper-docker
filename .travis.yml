@@ -28,7 +28,7 @@ script:
   # How does the host key dir look?
   - ls -lah $HKEYDIR
   # start wrapper
-  - docker run --volume=$HKEYDIR:$CKEYDIR -w $CKEYDIR --expose=443 --name=wrapper --detach dnscrypt-wrapper --listen-address=0.0.0.0:443 --resolver-address=8.8.8.8:53 --provider-name=2.dnscrypt-cert.test.dnscrypt.io --provider-cert-file=$CKEYDIR/dnscrypt.cert --crypt-secretkey-file=$CKEYDIR/crypt_secret.key
+  - docker run --volume=$HKEYDIR:$CKEYDIR -w $CKEYDIR --expose=4443 --name=wrapper --detach dnscrypt-wrapper --listen-address=0.0.0.0:4443 --resolver-address=8.8.8.8:53 --provider-name=2.dnscrypt-cert.test.dnscrypt.io --provider-cert-file=$CKEYDIR/dnscrypt.cert --crypt-secretkey-file=$CKEYDIR/crypt_secret.key
   # Is the dnscrypt-wrapper container running?
   - sleep 10; docker ps | grep dnscrypt-wrapper
   # Anything interesting in the logs?
@@ -37,5 +37,5 @@ script:
   - 'WRAPPERIP=$(docker inspect -f ''{{ .NetworkSettings.IPAddress }}'' wrapper)'
   - echo $WRAPPERIP
   # Run dnscrypt proxy
-  - docker run -e RESOLVER_ADDR=$WRAPPERIP:443 -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 -p 127.0.0.1:53:53/udp dnscryptio/dnscrypt-proxy
+  - docker run -e RESOLVER_ADDR=$WRAPPERIP:4443 -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 -p 127.0.0.1:53:53/udp dnscryptio/dnscrypt-proxy
   - dig @127.0.0.1 www.google.com
