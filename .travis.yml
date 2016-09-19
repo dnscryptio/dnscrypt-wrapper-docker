@@ -27,10 +27,10 @@ script:
   - stat -t $HKEYDIR/dnscrypt.cert
   # start wrapper
   - 'docker run --volume=$HKEYDIR:$CKEYDIR --expose=443 --name=wrapper --detach \
-       -e LISTEN_ADDRESS=0.0.0.0
-       -e LISTEN_PORT=443
-       -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io
-       dnscrypt-wrapper \
+       -e LISTEN_ADDRESS=0.0.0.0 \
+       -e LISTEN_PORT=443 \
+       -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io \
+       dnscrypt-wrapper'
   # Is the dnscrypt-wrapper container running? And what did it do?
   - sleep 10; docker ps | grep dnscrypt-wrapper; docker logs --details -t wrapper
   # Get wrapper internal ip
