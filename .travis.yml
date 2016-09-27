@@ -10,6 +10,9 @@ install:
 - rm -rf $HKEYDIR
 - mkdir -p $HKEYDIR
 script:
+- docker run -d --name bind dnscryptio/bind
+- BINDIP=$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' bind)
+- echo $BINDIP
 - docker run --interactive --tty --rm dnscryptio/dnscrypt-wrapper --version
 - docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscryptio/dnscrypt-wrapper
   --gen-provider-keypair | tee /tmp/gen-provider-keypair.log
@@ -26,7 +29,7 @@ script:
 - stat -t $HKEYDIR/dnscrypt.cert
 - ls -lah $HKEYDIR
 - docker run --volume=$HKEYDIR:$CKEYDIR -w $CKEYDIR --expose=4443 --name=wrapper --detach
-  dnscryptio/dnscrypt-wrapper --listen-address=0.0.0.0:4443 --resolver-address=8.8.8.8:53
+  dnscryptio/dnscrypt-wrapper --listen-address=0.0.0.0:4443 --resolver-address=$BINDIP:53
   --provider-name=2.dnscrypt-cert.test.dnscrypt.io --provider-cert-file=$CKEYDIR/dnscrypt.cert
   --crypt-secretkey-file=$CKEYDIR/crypt_secret.key
 - sleep 10; docker ps | grep dnscrypt-wrapper
