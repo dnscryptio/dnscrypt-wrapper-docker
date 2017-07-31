@@ -13,23 +13,23 @@ script:
 - docker run -d --name bind dnscryptio/bind
 - BINDIP=$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' bind)
 - echo $BINDIP
-- docker run --interactive --tty --rm dnscryptio/dnscrypt-wrapper --version
-- docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscryptio/dnscrypt-wrapper
+- docker run --interactive --tty --rm dnscrypt-wrapper --version
+- docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscrypt-wrapper
   --gen-provider-keypair | tee /tmp/gen-provider-keypair.log
 - 'PUBLIC_KEYPAIR_FINGERPRINT=$(egrep ''Public key fingerprint: '' /tmp/gen-provider-keypair.log
   | sed ''s/Public key fingerprint: //''); echo $PUBLIC_KEYPAIR_FINGERPRINT | tee
   $HKEYDIR/fingerprint; [ ! -z "$PUBLIC_KEYPAIR_FINGERPRINT" ]'
 - stat -t $HKEYDIR/public.key
 - stat -t $HKEYDIR/secret.key
-- docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscryptio/dnscrypt-wrapper
+- docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscrypt-wrapper
   --gen-crypt-keypair
 - stat -t $HKEYDIR/crypt_secret.key
-- docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscryptio/dnscrypt-wrapper
+- docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscrypt-wrapper
   --gen-cert-file
 - stat -t $HKEYDIR/dnscrypt.cert
 - ls -lah $HKEYDIR
 - docker run --volume=$HKEYDIR:$CKEYDIR -w $CKEYDIR --expose=4443 --name=wrapper --detach
-  dnscryptio/dnscrypt-wrapper --listen-address=0.0.0.0:4443 --resolver-address=$BINDIP:53
+  dnscrypt-wrapper --listen-address=0.0.0.0:4443 --resolver-address=$BINDIP:53
   --provider-name=2.dnscrypt-cert.test.dnscrypt.io --provider-cert-file=$CKEYDIR/dnscrypt.cert
   --crypt-secretkey-file=$CKEYDIR/crypt_secret.key
 - sleep 10; docker ps | grep dnscrypt-wrapper
@@ -38,7 +38,7 @@ script:
 - echo $WRAPPERIP
 - docker run --detach --name=proxy -e RESOLVER_ADDR=$WRAPPERIP:4443 -e PROVIDER_NAME=2.dnscrypt-cert.test.dnscrypt.io
   -e PROVIDER_KEY=$PUBLIC_KEYPAIR_FINGERPRINT -e LOGLEVEL=7 -p 127.0.0.1:53:53/udp
-  dnscryptio/dnscrypt-proxy
+  dnscrypt-proxy
 - docker logs -t --details proxy
 - dig @127.0.0.1 www.google.com
 after_success:
