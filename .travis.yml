@@ -6,7 +6,7 @@ env:
   - HKEYDIR=/tmp/dnscrypt-wrapper/keys
   - CKEYDIR=/opt/dnscrypt-wrapper/etc/keys
 install:
-- docker build -t dnscryptio/dnscrypt-wrapper .
+- docker build -t dnscrypt-wrapper .
 - rm -rf $HKEYDIR
 - mkdir -p $HKEYDIR
 script:
@@ -44,7 +44,7 @@ script:
 after_success:
 - export REPO=dnscryptio/dnscrypt-wrapper
 - if [ "$TRAVIS_BRANCH" == "master" ]; then docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-  docker tag $REPO $REPO:0.3; docker push $REPO; fi
+  docker tag dnscrypt-wrapper $REPO:0.3; docker push $REPO; fi
 notifications:
   slack:
     secure: Ux1jybA6Q65U0U272Xw3WybadeVB0ZAi9eS7K8UTqckN061mN486n7RHsheJ5sIp0v/CACIAywWeTKVeNJOw3J3i+UFhhrzt8UNYyF+YVYmbnIEUkKWlJ/biA9b2a4SEiUN1/6Jq9WBJ8kav3LZ4MUJRDI91cOSSCS1DKsurhLcOcjI4HNTL96P0da4LwrnZRnvzg2ltLATJR/+LVyM/kLGKke3DxWCeGOydOG9Tqho8poeaKH2DT5tdc0gr5NrAzIN0wb6mzrGPhXo++4bjwwPcg+5bwTzn42PHoK8Hai6tBOvLkmNV49WGhn7LhNI3eaAPmog9vWzn4ACyyDVpJN29iJjFkzNLU44AcJKgd1hr3pbTwrVal8yINwmkveStQInS665GZ5pSuG/WxGvOdVG9SBypUwVfse98RGMvqFx17hBq/ftCVkmG56XRLFuFXOpf0f7jZYElJOUIU9I8ZVqJ1on7uZx2K1lfj1U1MjoavQKGivTPHKPLv9dfEiv37w/PTH5+Rfk5jk6P7+OwTfwJRx2s36dDstydCyri6LD+paBQJa3hxN58wDOLOZ+gWNmcU9on3Oh3pVV+3dGhogGdlm/CW1v42qwEs2ohYjDMD6Ghy92MeFBdx1ihvpZqXq9mmEq7ygHwwbNDvxiRKd5jp7q48xx3eOFaVaDEcXY=
