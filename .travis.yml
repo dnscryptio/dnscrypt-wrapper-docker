@@ -14,13 +14,13 @@ script:
 - BINDIP=$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' bind)
 - echo $BINDIP
 - docker run --interactive --tty --rm dnscryptio/dnscrypt-wrapper --version
+- stat -t $HKEYDIR/public.key || stat -t $HKEYDIR/secret.key || echo Provider key pair not present
 - docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscryptio/dnscrypt-wrapper
   --gen-provider-keypair | tee /tmp/gen-provider-keypair.log
 - 'PUBLIC_KEYPAIR_FINGERPRINT=$(egrep ''Public key fingerprint: '' /tmp/gen-provider-keypair.log
   | sed ''s/Public key fingerprint: //''); echo $PUBLIC_KEYPAIR_FINGERPRINT | tee
   $HKEYDIR/fingerprint; [ ! -z "$PUBLIC_KEYPAIR_FINGERPRINT" ]'
-- stat -t $HKEYDIR/public.key
-- stat -t $HKEYDIR/secret.key
+- stat -t $HKEYDIR/public.key && stat -t $HKEYDIR/secret.key && echo Provider keypair found
 - docker run --interactive --tty --rm --volume $HKEYDIR:$CKEYDIR -w $CKEYDIR dnscryptio/dnscrypt-wrapper
   --gen-crypt-keypair
 - stat -t $HKEYDIR/crypt_secret.key
