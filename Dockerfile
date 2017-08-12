@@ -15,7 +15,7 @@ RUN set -x && \
 
 ENV LIBSODIUM_VERSION 1.0.11
 ENV LIBSODIUM_SHA256 a14549db3c49f6ae2170cbbf4664bd48ace50681045e8dbea7c8d9fb96f9c765
-ENV LIBSODIUM_DOWNLOAD_URL https://download.libsodium.org/libsodium/releases/libsodium-${LIBSODIUM_VERSION}.tar.gz
+ENV LIBSODIUM_DOWNLOAD_URL https://download.libsodium.org/libsodium/releases/old/libsodium-${LIBSODIUM_VERSION}.tar.gz
 
 RUN set -x && \
     mkdir -p /tmp/src && \
@@ -55,6 +55,7 @@ RUN set -x && \
     groupadd ${DNSCRYPT_WRAPPER_USER} && \
     useradd -g ${DNSCRYPT_WRAPPER_USER} -s /bin/false -d /opt/dnscrypt-wrapper/empty ${DNSCRYPT_WRAPPER_USER} && \
     mkdir -p ${DNSCRYPT_WRAPPER_KEYS} && \
+    chown ${DNSCRYPT_WRAPPER_USER}:${DNSCRYPT_WRAPPER_USER} ${DNSCRYPT_WRAPPER_KEYS} && \
     apt-get purge -y --auto-remove libevent-dev && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
