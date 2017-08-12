@@ -55,6 +55,7 @@ RUN set -x && \
     groupadd ${DNSCRYPT_WRAPPER_USER} && \
     useradd -g ${DNSCRYPT_WRAPPER_USER} -s /bin/false -d /opt/dnscrypt-wrapper/empty ${DNSCRYPT_WRAPPER_USER} && \
     mkdir -p ${DNSCRYPT_WRAPPER_KEYS} && \
+    chown ${DNSCRYPT_WRAPPER_USER}:${DNSCRYPT_WRAPPER_USER} ${DNSCRYPT_WRAPPER_KEYS} && \
     apt-get purge -y --auto-remove libevent-dev && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
