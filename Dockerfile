@@ -25,7 +25,7 @@ RUN set -x && \
     tar xzf libsodium.tar.gz && \
     rm -f libsodium.tar.gz && \
     cd libsodium-${LIBSODIUM_VERSION} && \
-    ./configure --disable-dependency-tracking --enable-minimal --prefix=/opt/libsodium && \
+    ./configure --disable-dependency-tracking --prefix=/opt/libsodium && \
     make check && make install && \
     echo /opt/libsodium/lib > /etc/ld.so.conf.d/libsodium.conf && ldconfig && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
