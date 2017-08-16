@@ -43,6 +43,5 @@ echo "-> Test for working DNS lookups via dnscrypt-proxy"
 dig @127.0.0.1 www.google.com
 
 rm /tmp/gen-provider-keypair.log
-rm /tmp/fingerprint
 docker stop proxy; docker stop wrapper; docker stop bind; docker rm proxy; docker rm wrapper; docker rm bind
 docker volume rm $HKEYDIR
