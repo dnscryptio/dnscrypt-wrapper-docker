@@ -1,4 +1,4 @@
-FROM debian:8
+FROM debian:stretch-slim
 MAINTAINER dnscrypt.io
 
 ENV BUILD_DEPENDENCIES \
